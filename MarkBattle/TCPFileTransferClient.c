@@ -1,3 +1,11 @@
+/* This File is the Client file where the client can print out the required
+ * items. The client takes in 3 or 4 arguments and attempts to establish 
+ * a connection with the server. It sends the name of the file as one of the 
+ * arguments to the server if connection is established. It then receives 
+ * either an error message that the file did not exist or the contents of the 
+ * file requested. It also prints out the number of bytes received.
+ */
+
 #include <stdio.h> /*for printf() and fprintf()*/
 #include <sys/socket.h> /*for socket(), connect(), send(), and recv()*/
 #include <arpa/inet.h> /*for sockaddr_in and inet_addr()*/
@@ -15,10 +23,10 @@ int main(int argc, char *argv[])
 	struct sockaddr_in echoServAddr;
 	unsigned short servPort;
 	char *servIP;
-	char *fileName;
-	char fileBuffer[RCVFILEBUFSIZE];
-	unsigned int fileNameLen;
-	int bytesRcvd;
+	char *fileName; /* file name from argument sent to server */
+	char fileBuffer[RCVFILEBUFSIZE]; /* receives file or error message */
+	unsigned int fileNameLen; 
+	int bytesRcvd; /* keeps track of number of bytes in file (1 char = 1 byte)*/
 	int rcvdLength;
 
 	if ((argc<3)||(argc>4))
@@ -59,7 +67,6 @@ int main(int argc, char *argv[])
 	/*Receive message from server (either error that file doesnt exist or
 	 * the contents of the file requested)
 	*/
-
 	printf("Received: ");
 
 	if((bytesRcvd = recv(sock, fileBuffer, RCVFILEBUFSIZE, 0))<=0)
@@ -77,6 +84,7 @@ int main(int argc, char *argv[])
 	printf(fileBuffer);
 
 	printf("\n");
+
 	/* each individual character is 1 byte so the length of the string will give you the total bytes received */
 	printf("Received %d bytes\n", strlen(fileBuffer));
 

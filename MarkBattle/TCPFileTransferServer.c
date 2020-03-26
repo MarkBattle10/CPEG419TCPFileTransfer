@@ -1,3 +1,9 @@
+/* This is the file for the server. It takes in a port number as an argument.
+ * It runs forever waiting for a client to connect and then calls the 
+ * HandleTCPClient function.
+ */
+
+
 #include <stdio.h> /*for printf() and fprintf()*/
 #include <sys/socket.h> /*for socket(), connect(), send(), and recv()*/
 #include <arpa/inet.h> /*for sockaddr_in and inet_addr()*/
@@ -55,8 +61,7 @@ int main(int argc, char *argv[])
 			DieWithError("accept() failed");
 		/* clntSock is connected to a client! */
 		printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
-		
-		//TCPServerPrint (servSock, clntSock);	
+			
 		HandleTCPClient (clntSock) ;
 }
 /* NOT REACHED */

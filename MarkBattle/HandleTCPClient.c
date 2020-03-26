@@ -1,3 +1,12 @@
+/* This file is called when the server connects to a client. This file begins by
+ * receiving the filename from the client and printing it out. It then checks if
+ * the file is there. If the file is not there then it sends an error message 
+ * back to the client to say that there is no file. If the file is there, it 
+ * reads the file one character at a time into a buffer and sends the buffer to
+ * the client. It then closes the client socket.
+ */
+
+
 #include <stdio.h> /* for printf() and fprintf() */
 #include <stdio.h> /* for printf() and fprintf() */
 #include <unistd.h> /* for close() */
@@ -15,12 +24,12 @@ void HandleTCPClient(int clntSocket)
 	char *errorMessage;
 	char errorBuffer[ERRBUFSIZE];       /* Buffer that is sent if file cannot be found */
 	char readFileBuffer[READFILEBUFSIZE]; /* buffer for reading the file its int because fgetc returns ascii ints of each character */
-	int recvMsgSize;
-	int strLength;
-	int readFile;
-	int index;
-	int totalBytes;
-	FILE *fptr;
+	int recvMsgSize; /* used to receive the first packet sent from the clientwhich would be the file name*/
+	int strLength; /* used to get the length of the filename */
+	int readFile; /* used to read one character at a time from the fgetc command which turns the character into its ascii integer */
+	int index; /* used to increment the readFileBuffer with each character */
+	int totalBytes; /*keeps track of the bytes returned from the file (1 char = 1 byte)*/
+	FILE *fptr; /*used to open the file*/
 
 	/* Receive message from client */
 	if ((recvMsgSize = recv(clntSocket, fileNameBuffer, RCVBUFSIZE, 0)) < 0)
@@ -40,18 +49,19 @@ void HandleTCPClient(int clntSocket)
 		fileNameBuffer[strLength] = '\0';
 		strLength++;
 	}
-	//printf("file Name: %s\n", fileNameBuffer);
 	
 	/* Open the file for reading */
 	fptr = fopen(fileNameBuffer, "r");
-	
+
+	/* check if file is there. if not send error message to client. If it is
+	 * there, read the file one character at a time into a buffer and send
+	 * the buffer to the client.
+	 */
 	if(!fptr){
 		errorMessage = "Error: file does not exist";
 		for(int i=0;i<strlen(errorMessage);i++){
 			errorBuffer[i] = errorMessage[i];
-			//printf("%c", errorBuffer[i]);
 		}
-		//printf("\n");
 		if (send(clntSocket, errorBuffer, strlen(errorBuffer), 0) != strlen(errorBuffer))
 			DieWithError("send() failed");
 
@@ -75,19 +85,4 @@ void HandleTCPClient(int clntSocket)
 	
 	close(clntSocket); /* Close client socket */
 	
-	/* Send received string and receive again until end of transmission */
-	
-//	while (recvMsgSize > 0) /* zero indicates end of transmission */
-//	{
-//		/* Echo message back to client */
-//		if (send(clntSocket, fileNameBuffer, recvMsgSize, 0) != recvMsgSize)
-//			DieWithError("send() failed");
-//
-//		/* See if there is more data to receive */
-//		if ((recvMsgSize = recv(clntSocket, fileNameBuffer, RCVBUFSIZE, 0)) < 0)
-//			DieWithError("recv() failed") ;
-//
-//	}
-//
-//	close(clntSocket); /* Close client socket */
 }
