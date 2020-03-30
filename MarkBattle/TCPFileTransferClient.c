@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 		fileBuffer[rcvdLength] = '\0';
 		rcvdLength += 1;
 	}
-	totalBytesRcvd += rcvdLength-1;
+	totalBytesRcvd += bytesRcvd;
 	printf(fileBuffer);
 
 	printf("\n");
