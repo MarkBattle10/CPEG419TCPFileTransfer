@@ -13,7 +13,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define RCVFILEBUFSIZE 2048 /*size of the receive buffer*/
+#define RCVFILEBUFSIZE 64 /*size of the receive buffer*/
 
 void DieWithError(char *errMsg);
 
@@ -28,6 +28,7 @@ int main(int argc, char *argv[])
 	unsigned int fileNameLen; 
 	int bytesRcvd; /* keeps track of number of bytes in file (1 char = 1 byte)*/
 	int rcvdLength;
+	int totalBytesRcvd; /* keeps track of the total bytes received from all the buffers sent from server */
 
 	if ((argc<3)||(argc>4))
 	{
@@ -71,6 +72,30 @@ int main(int argc, char *argv[])
 
 	if((bytesRcvd = recv(sock, fileBuffer, RCVFILEBUFSIZE, 0))<=0)
 		DieWithError("recv() failed or connection closed prematurely");
+	
+	/* continuously receive if the bytesRcvd is equal to
+	 * RCVFILEBUFSIZE because it sent a full buffer.
+	 * Should work if file is exactly the size of RCVFILEBUFSIZE
+	 */
+	while(bytesRcvd == RCVFILEBUFSIZE){
+		rcvdLength = 0;
+		/* these two while loops get rid of extra junk at end of actual buffer received */
+		while(rcvdLength < bytesRcvd){
+			rcvdLength += 1;	
+		}
+		while(rcvdLength < strlen(fileBuffer)){
+			fileBuffer[rcvdLength] = '\0';
+			rcvdLength += 1;
+		}
+		totalBytesRcvd += RCVFILEBUFSIZE;
+		printf(fileBuffer);
+		/* in this case, if bytesRcvd is 0 then the file was
+		 * exactly 64 bytes in size
+		 */
+		if((bytesRcvd = recv(sock, fileBuffer, RCVFILEBUFSIZE, 0))<0)
+			DieWithError("recv() failed or connection closed prematurely"); 
+	}
+	
 	/* Next section is to get rid of any extra junk received at the end of the buffer so it is just the string from the file */
 	rcvdLength = 0;
 	while(rcvdLength < bytesRcvd){
@@ -80,13 +105,13 @@ int main(int argc, char *argv[])
 		fileBuffer[rcvdLength] = '\0';
 		rcvdLength += 1;
 	}
-
+	totalBytesRcvd += rcvdLength-1;
 	printf(fileBuffer);
 
 	printf("\n");
 
 	/* each individual character is 1 byte so the length of the string will give you the total bytes received */
-	printf("Received %d bytes\n", strlen(fileBuffer));
+	printf("Received %d bytes\n", totalBytesRcvd);
 
 	close(sock);
 	exit(0);
