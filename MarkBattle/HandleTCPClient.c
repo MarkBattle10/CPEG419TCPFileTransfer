@@ -29,6 +29,7 @@ void HandleTCPClient(int clntSocket)
 	int readFile; /* used to read one character at a time from the fgetc command which turns the character into its ascii integer */
 	int index; /* used to increment the readFileBuffer with each character */
 	int totalBytes; /*keeps track of the bytes returned from the file (1 char = 1 byte)*/
+	int removeFileEnds; /* used to remove any bad characters at the end of a file */
 	FILE *fptr; /*used to open the file*/
 
 	/* Receive message from client */
@@ -66,7 +67,6 @@ void HandleTCPClient(int clntSocket)
 			DieWithError("send() failed");
 		totalBytes = strlen(errorBuffer);
 		printf("Sending %d bytes\n",totalBytes);
-
 	}
 	else{
 		index = 0;
@@ -84,7 +84,11 @@ void HandleTCPClient(int clntSocket)
 			totalBytes++;
 			index++;	
 		}
-
+		removeFileEnds = totalBytes;
+		while(removeFileEnds<strlen(readFileBuffer)){
+			readFileBuffer[removeFileEnds] = '\0';
+			removeFileEnds += 1;
+		}
 		printf("Sending %d bytes\n",totalBytes);
 		
 		if (send(clntSocket, readFileBuffer, strlen(readFileBuffer), 0) != strlen(readFileBuffer))
