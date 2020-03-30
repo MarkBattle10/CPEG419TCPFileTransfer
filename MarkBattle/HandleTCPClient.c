@@ -14,7 +14,7 @@
 
 #define RCVBUFSIZE 32 /* Size of receive buffer */
 #define ERRBUFSIZE 32 /* Size of error buffer */
-#define READFILEBUFSIZE 2048 /* Size of read file buffer */
+#define READFILEBUFSIZE 64 /* Size of read file buffer */
 
 void DieWithError(char *errMsg);
 
