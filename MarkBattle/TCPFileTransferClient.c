@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
 	 * RCVFILEBUFSIZE because it sent a full buffer.
 	 * Should work if file is exactly the size of RCVFILEBUFSIZE
 	 */
+	totalBytesRcvd = 0;
 	while(bytesRcvd == RCVFILEBUFSIZE){
 		rcvdLength = 0;
 		/* these two while loops get rid of extra junk at end of actual buffer received */
