@@ -70,6 +70,14 @@ void HandleTCPClient(int clntSocket)
 		index = 0;
 		totalBytes = 0;
 		while((readFile = fgetc(fptr)) != EOF){
+			if(index == READFILEBUFSIZE){
+				if(send(clntSocket, readFileBuffer, READFILEBUFSIZE, 0) != strlen(readFileBuffer))
+					DieWithError("send() failed");
+				index = 0;
+				for(int i=0; i<=READFILEBUFSIZE; i++){
+					readFileBuffer[i] = '\0';	
+				}
+			}
 			readFileBuffer[index] = (char) readFile;
 			totalBytes++;
 			index++;	
