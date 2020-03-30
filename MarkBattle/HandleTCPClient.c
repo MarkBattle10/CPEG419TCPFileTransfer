@@ -64,6 +64,8 @@ void HandleTCPClient(int clntSocket)
 		}
 		if (send(clntSocket, errorBuffer, strlen(errorBuffer), 0) != strlen(errorBuffer))
 			DieWithError("send() failed");
+		totalBytes = strlen(errorBuffer);
+		printf("Sending %d bytes\n",totalBytes);
 
 	}
 	else{
